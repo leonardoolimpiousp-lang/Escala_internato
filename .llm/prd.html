@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRD — Escala Internato FMUSP</title>
+<style>
+  :root {
+    --green: #0F6B45;
+    --green-dark: #0A5235;
+    --green-light: #E8F5EE;
+    --gold: #B6922E;
+    --gold-light: #FAF3DD;
+    --gray-50: #FAFAFA;
+    --gray-100: #F4F4F5;
+    --gray-200: #E4E4E7;
+    --gray-300: #D4D4D8;
+    --gray-400: #A1A1AA;
+    --gray-500: #71717A;
+    --gray-600: #52525B;
+    --gray-700: #3F3F46;
+    --gray-800: #27272A;
+    --gray-900: #18181B;
+    --success: #16A34A;
+    --success-bg: #DCFCE7;
+    --warning: #D97706;
+    --warning-bg: #FEF3C7;
+    --error: #DC2626;
+    --error-bg: #FEE2E2;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 880px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* Header */
+  header {
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+    color: #fff;
+    padding: 56px 24px;
+    margin-bottom: 40px;
+  }
+  header .wrap { padding-bottom: 0; }
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; opacity: 0.85; margin-bottom: 12px;
+    display: inline-block;
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 4px 12px; border-radius: 999px;
+  }
+  header h1 { font-size: 42px; font-weight: 700; letter-spacing: -0.02em; }
+  header p { font-size: 18px; opacity: 0.92; margin-top: 12px; max-width: 640px; }
+
+  /* Sections */
+  section { margin-bottom: 40px; }
+  h2 {
+    font-size: 26px; font-weight: 600; color: var(--green-dark);
+    margin-bottom: 16px; padding-bottom: 10px;
+    border-bottom: 2px solid var(--green-light);
+    display: flex; align-items: center; gap: 12px;
+  }
+  h2 .num {
+    background: var(--green); color: #fff; font-size: 14px;
+    width: 28px; height: 28px; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  h3 { font-size: 18px; font-weight: 600; color: var(--gray-900); margin: 20px 0 8px; }
+  p { margin-bottom: 12px; }
+
+  .lead { font-size: 17px; color: var(--gray-700); }
+
+  /* Cards */
+  .card {
+    background: #fff; border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg); padding: 22px 24px;
+    box-shadow: var(--shadow-sm); margin-bottom: 16px;
+  }
+  .card.problem { border-left: 4px solid var(--warning); }
+  .card.solution { border-left: 4px solid var(--success); }
+
+  /* Persona grid */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .persona h3 { color: var(--green); margin-top: 0; }
+  .persona ul { list-style: none; }
+  .persona li { padding-left: 20px; position: relative; margin-bottom: 6px; font-size: 15px; }
+  .persona li::before { content: "→"; position: absolute; left: 0; color: var(--green); }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; background: #fff;
+    border: 1px solid var(--gray-200); border-radius: var(--radius-md);
+    overflow: hidden; box-shadow: var(--shadow-sm); }
+  th { background: var(--green-light); color: var(--green-dark);
+    text-align: left; padding: 12px 16px; font-size: 13px;
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+  td { padding: 12px 16px; border-top: 1px solid var(--gray-100); font-size: 15px; vertical-align: top; }
+  td code, .mono { font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 13px; background: var(--gray-100); padding: 2px 6px;
+    border-radius: 6px; color: var(--gray-700); }
+
+  /* Feature cards */
+  .feature {
+    background: #fff; border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg); padding: 20px 22px;
+    box-shadow: var(--shadow-sm); margin-bottom: 14px;
+  }
+  .feature-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .ftag {
+    background: var(--green); color: #fff; font-weight: 700; font-size: 13px;
+    padding: 4px 10px; border-radius: 8px; flex-shrink: 0;
+  }
+  .feature-head h3 { margin: 0; font-size: 17px; }
+  .feature p { margin-bottom: 8px; font-size: 15px; color: var(--gray-700); }
+  .accept {
+    font-size: 14px; background: var(--success-bg); color: #14532d;
+    border-radius: 8px; padding: 8px 12px; margin-top: 8px;
+  }
+  .accept b { color: var(--success); }
+
+  /* Preference pills */
+  .pills { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0; }
+  .pill { font-size: 14px; font-weight: 600; padding: 6px 14px; border-radius: 999px; }
+  .pill.quero { background: var(--success-bg); color: var(--success); }
+  .pill.posso { background: var(--warning-bg); color: var(--warning); }
+  .pill.imp { background: var(--error-bg); color: var(--error); }
+
+  /* Numbered / bullet lists */
+  ol.rules, ul.bullets { padding-left: 0; list-style: none; }
+  ol.rules li, ul.bullets li {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-md);
+    padding: 12px 16px 12px 44px; margin-bottom: 8px; position: relative; font-size: 15px;
+    box-shadow: var(--shadow-sm);
+  }
+  ol.rules { counter-reset: r; }
+  ol.rules li { counter-increment: r; }
+  ol.rules li::before {
+    content: counter(r); position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+    background: var(--green); color: #fff; width: 22px; height: 22px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;
+  }
+  ul.bullets li::before {
+    content: ""; position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+    width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
+  }
+
+  /* Metrics */
+  .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .metric {
+    background: var(--gold-light); border: 1px solid #efe3c0;
+    border-radius: var(--radius-lg); padding: 18px 20px;
+  }
+  .metric .m-label { font-size: 14px; color: var(--gray-700); }
+  .metric .m-value { font-size: 18px; font-weight: 700; color: var(--gold); margin-top: 4px; }
+
+  /* Out of scope */
+  .oos { display: flex; flex-wrap: wrap; gap: 10px; }
+  .oos span {
+    background: var(--gray-100); color: var(--gray-600); font-size: 14px;
+    padding: 8px 14px; border-radius: 999px; border: 1px solid var(--gray-200);
+  }
+
+  /* Three escalas */
+  .escalas { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 12px; }
+  .escala { border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 14px; background: var(--gray-50); }
+  .escala .e-name { font-weight: 700; color: var(--green); }
+  .escala .e-desc { font-size: 14px; color: var(--gray-600); margin-top: 4px; }
+
+  footer { text-align: center; color: var(--gray-400); font-size: 13px; margin-top: 48px; }
+  footer a { color: var(--green); text-decoration: none; }
+
+  @media (max-width: 680px) {
+    .grid-2, .metrics, .escalas { grid-template-columns: 1fr; }
+    header h1 { font-size: 32px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="eyebrow">PRD · Product Requirements</span>
+    <h1>Escala Internato FMUSP</h1>
+    <p>Coleta de preferências de turnos do internato médico e geração determinística de escalas pelo preceptor.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section>
+    <h2><span class="num">1</span> Visão Geral</h2>
+    <p class="lead">Plataforma web para <b>coleta de preferências de turnos</b> dos alunos do internato e <b>geração determinística de escalas</b> pelo preceptor.</p>
+    <div class="card problem">
+      <h3 style="margin-top:0;color:var(--warning)">Problema</h3>
+      <p style="margin-bottom:0">Escalas de internato hoje são montadas manualmente em planilhas — processo lento, sujeito a erros e percebido como injusto. Não há registro estruturado das preferências dos alunos nem critério transparente de alocação.</p>
+    </div>
+    <div class="card solution">
+      <h3 style="margin-top:0;color:var(--success)">Solução</h3>
+      <p style="margin-bottom:0">O preceptor cria a escala de uma rotação; os alunos declaram preferências por turno (Quero / Posso / Impossível) em uma grade; um motor determinístico gera escalas otimizadas — respeitando restrições e maximizando satisfação. Resultado: escalas justas, geradas em segundos, com métricas claras de satisfação e equidade.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">2</span> Personas</h2>
+    <div class="grid-2">
+      <div class="card persona">
+        <h3>Aluno (interno)</h3>
+        <ul>
+          <li>Visualiza as rotações em que foi incluído</li>
+          <li>Preenche preferências em uma grade matricial</li>
+          <li>Envia quando 100% preenchidas</li>
+          <li>Consulta sua escala final e métricas pessoais</li>
+        </ul>
+      </div>
+      <div class="card persona">
+        <h3>Preceptor</h3>
+        <ul>
+          <li>Cria rotações (período, nº de alunos)</li>
+          <li>Define dias bloqueados (aulas, provas, reuniões)</li>
+          <li>Adiciona alunos à rotação</li>
+          <li>Gera escalas e escolhe entre as opções</li>
+          <li>Acompanha satisfação e carga por aluno</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">3</span> Conceitos de Domínio</h2>
+    <table>
+      <tr><th>Conceito</th><th>Descrição</th></tr>
+      <tr><td><b>Rotation</b></td><td>Uma escala de internato. Ex.: "Clínica Médica — Maio 2027". Tem <code>data_inicio</code>, <code>data_fim</code>, <code>numero_alunos</code>.</td></tr>
+      <tr><td><b>Shift</b></td><td>Um turno: data + período (Manhã / Tarde / Noite) + tipo. Gerados automaticamente ao criar a rotação.</td></tr>
+      <tr><td><b>Tipo de shift</b></td><td><code>PLANTAO</code> · <code>AULA</code> · <code>PROVA</code>. Aulas/provas viram turnos obrigatórios.</td></tr>
+      <tr><td><b>Preferência</b></td><td>Escolha do aluno para um shift:
+        <div class="pills">
+          <span class="pill quero">♥ Quero</span>
+          <span class="pill posso">● Posso</span>
+          <span class="pill imp">✕ Impossível</span>
+        </div>
+      </td></tr>
+      <tr><td><b>Escala gerada</b></td><td>Resultado da alocação determinística. O sistema produz 3 variantes.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2><span class="num">4</span> Features Core (MVP)</h2>
+
+    <div class="feature">
+      <div class="feature-head"><span class="ftag">F1</span><h3>Cadastro e Login</h3></div>
+      <p>Cadastro com email + senha (Supabase Auth) e papel (Aluno / Preceptor).</p>
+      <div class="accept"><b>Aceite:</b> usuário se cadastra, loga e é roteado para a área do seu papel.</div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-head"><span class="ftag">F2</span><h3>Criar Rotação</h3></div>
+      <p>Preceptor cria rotação com data início, data fim e nº de alunos. O sistema gera automaticamente os shifts (Manhã/Tarde/Noite para cada dia).</p>
+      <div class="accept"><b>Aceite:</b> após criar, todos os shifts do período existem com tipo <code>PLANTAO</code> por padrão.</div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-head"><span class="ftag">F3</span><h3>Dias Bloqueados</h3></div>
+      <p>Preceptor marca eventos (Aula / Prova / Reunião). Esses shifts viram obrigatórios e não recebem preferência do aluno.</p>
+      <div class="accept"><b>Aceite:</b> shifts marcados aparecem como "Bloqueado pelo preceptor" na grade do aluno.</div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-head"><span class="ftag">F4</span><h3>Adicionar Alunos à Rotação</h3></div>
+      <p>Preceptor associa alunos à rotação (<code>student_rotations</code>).</p>
+      <div class="accept"><b>Aceite:</b> apenas alunos associados veem a rotação e preenchem preferências.</div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-head"><span class="ftag">F5</span><h3>Preenchimento de Preferências (grade matricial)</h3></div>
+      <p>Aluno preenche em uma <b>grade</b> (semana × dias × 3 turnos), <b>não</b> em calendário tradicional. Salvo como rascunho local — sem realtime.</p>
+      <div class="accept"><b>Aceite:</b> cada célula aceita Quero/Posso/Impossível; estado preservado durante a navegação.</div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-head"><span class="ftag">F6</span><h3>Envio de Preferências</h3></div>
+      <p>Botão "Enviar Preferências" só habilita com <b>100% das células preenchidas</b>. Ao enviar, grava submissão e <code>submitted_at</code>.</p>
+      <div class="accept"><b>Aceite:</b> botão desabilitado se houver célula vazia; após envio, status muda para "Preferências enviadas" e não é mais editável (MVP).</div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-head"><span class="ftag">F7</span><h3>Geração de Escala</h3></div>
+      <p>Worker determinístico produz <b>3 soluções</b>:</p>
+      <div class="escalas">
+        <div class="escala"><div class="e-name">Escala A</div><div class="e-desc">Máxima satisfação (prioriza QUERO)</div></div>
+        <div class="escala"><div class="e-name">Escala B</div><div class="e-desc">Balanceamento de carga horária</div></div>
+        <div class="escala"><div class="e-name">Escala C</div><div class="e-desc">Satisfação + equidade</div></div>
+      </div>
+      <div class="accept" style="margin-top:12px"><b>Aceite:</b> nenhuma alocação cai em turno IMPOSSÍVEL; as 3 escalas são apresentadas com suas métricas.</div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-head"><span class="ftag">F8</span><h3>Escolha da Escala</h3></div>
+      <p>Preceptor compara as 3 e seleciona uma como oficial.</p>
+      <div class="accept"><b>Aceite:</b> escala escolhida fica marcada e visível para os alunos.</div>
+    </div>
+
+    <div class="feature">
+      <div class="feature-head"><span class="ftag">F9</span><h3>Dashboard de Métricas</h3></div>
+      <p><b>Por aluno:</b> turnos QUERO aceitos, POSSO aceitos, IMPOSSÍVEL aceitos (deve ser 0), % de satisfação.<br>
+      <b>Por semana:</b> carga horária (heatmap / barras horizontais / tabela).</p>
+      <div class="accept"><b>Aceite:</b> métricas batem com a escala selecionada.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">5</span> Regras de Negócio</h2>
+    <ol class="rules">
+      <li>Turno marcado como <b>IMPOSSÍVEL nunca</b> é alocado</li>
+      <li>Distribuição de turnos equilibrada entre alunos</li>
+      <li>Carga horária semelhante entre alunos</li>
+      <li>Respeitar máximo de plantões por semana</li>
+      <li>Respeitar máximo de noites consecutivas</li>
+      <li>Preferências só são consideradas após envio (submitted)</li>
+      <li>Shifts bloqueados (Aula/Prova) são obrigatórios e ignoram preferência</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2><span class="num">6</span> Métricas de Sucesso</h2>
+    <div class="metrics">
+      <div class="metric"><div class="m-label">Satisfação média</div><div class="m-value">% de QUERO/POSSO atendidos</div></div>
+      <div class="metric"><div class="m-label">Equidade de carga</div><div class="m-value">Desvio de horas em faixa aceitável</div></div>
+      <div class="metric"><div class="m-label">Alocações em IMPOSSÍVEL</div><div class="m-value">0 (zero)</div></div>
+      <div class="metric"><div class="m-label">Tempo de geração</div><div class="m-value">&lt; poucos segundos (20–200 alunos)</div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">7</span> Fora de Escopo (v1)</h2>
+    <div class="oos">
+      <span>Realtime</span>
+      <span>Nível "Quero Muito"</span>
+      <span>Google OR-Tools</span>
+      <span>Storage / anexos</span>
+      <span>Notificações</span>
+      <span>Editar preferências após envio</span>
+    </div>
+  </section>
+
+  <footer>
+    Escala Internato FMUSP · Documentos relacionados:
+    <a href="designsystem.md">designsystem.md</a> ·
+    <a href="CLAUDE.md">CLAUDE.md</a>
+  </footer>
+
+</div>
+</body>
+</html>

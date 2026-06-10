@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  turbopack: {
+    // Fixa a raiz no projeto (há outro lockfile no home do usuário).
+    root: __dirname,
+  },
 };
 
 export default nextConfig;

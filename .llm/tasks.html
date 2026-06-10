@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarefas — Escala Internato FMUSP</title>
+<style>
+  :root {
+    --green: #0F6B45;
+    --green-dark: #0A5235;
+    --green-light: #E8F5EE;
+    --gold: #B6922E;
+    --gold-light: #FAF3DD;
+    --gray-50: #FAFAFA;
+    --gray-100: #F4F4F5;
+    --gray-200: #E4E4E7;
+    --gray-300: #D4D4D8;
+    --gray-400: #A1A1AA;
+    --gray-500: #71717A;
+    --gray-600: #52525B;
+    --gray-700: #3F3F46;
+    --gray-800: #27272A;
+    --gray-900: #18181B;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--gray-800); background: var(--gray-50);
+    line-height: 1.6; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px 80px; }
+
+  header {
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-dark) 100%);
+    color: #fff; padding: 56px 24px; margin-bottom: 16px;
+  }
+  header .wrap { padding-bottom: 0; }
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; opacity: 0.85; margin-bottom: 12px;
+    display: inline-block; border: 1px solid rgba(255,255,255,0.35);
+    padding: 4px 12px; border-radius: 999px;
+  }
+  header h1 { font-size: 42px; font-weight: 700; letter-spacing: -0.02em; }
+  header p { font-size: 18px; opacity: 0.92; margin-top: 12px; max-width: 660px; }
+
+  /* Summary bar */
+  .summary {
+    display: flex; gap: 12px; flex-wrap: wrap; margin: 24px 0 32px;
+  }
+  .stat {
+    flex: 1; min-width: 140px; background: #fff; border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg); padding: 16px 18px; box-shadow: var(--shadow-sm);
+  }
+  .stat .s-num { font-size: 28px; font-weight: 700; color: var(--green); }
+  .stat .s-lab { font-size: 13px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.04em; }
+
+  /* Phase card */
+  .phase {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm); margin-bottom: 18px; overflow: hidden;
+  }
+  .phase-head {
+    display: flex; align-items: center; gap: 14px; padding: 18px 22px;
+    border-bottom: 1px solid var(--gray-100); background: var(--green-light);
+  }
+  .phase-num {
+    background: var(--green); color: #fff; font-weight: 700; font-size: 15px;
+    width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .phase-title { flex: 1; }
+  .phase-title h2 { font-size: 19px; font-weight: 600; color: var(--green-dark); }
+  .ftags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+  .ftag {
+    font-size: 11px; font-weight: 700; background: var(--gold-light); color: var(--gold);
+    padding: 2px 8px; border-radius: 6px; border: 1px solid #efe3c0;
+  }
+  .ftag.base { background: var(--gray-100); color: var(--gray-600); border-color: var(--gray-200); }
+
+  ul.tasks { list-style: none; padding: 14px 22px 18px; }
+  ul.tasks li {
+    position: relative; padding: 7px 0 7px 30px; font-size: 15px;
+    color: var(--gray-700); border-bottom: 1px solid var(--gray-50);
+  }
+  ul.tasks li:last-child { border-bottom: none; }
+  ul.tasks li::before {
+    content: ""; position: absolute; left: 0; top: 11px;
+    width: 16px; height: 16px; border: 2px solid var(--gray-300);
+    border-radius: 5px; background: #fff;
+  }
+  ul.tasks li.sub { padding-left: 50px; font-size: 14px; color: var(--gray-600); }
+  ul.tasks li.sub::before { left: 22px; top: 10px; width: 13px; height: 13px; }
+  ul.tasks li b { color: var(--green-dark); }
+  code {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12.5px;
+    background: var(--gray-100); padding: 1px 6px; border-radius: 5px; color: var(--gray-700);
+  }
+  .zero { color: #DC2626; font-weight: 700; }
+
+  footer { text-align: center; color: var(--gray-400); font-size: 13px; margin-top: 40px; }
+  footer a { color: var(--green); text-decoration: none; }
+  @media (max-width: 680px) { header h1 { font-size: 32px; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="eyebrow">Tarefas · Roadmap de Execução</span>
+    <h1>Escala Internato FMUSP</h1>
+    <p>Features e tarefas organizadas em fases sequenciais para execução por IDE+LLM. Fiel ao rascunho original e ao PRD.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="summary">
+    <div class="stat"><div class="s-num">11</div><div class="s-lab">Fases</div></div>
+    <div class="stat"><div class="s-num">9</div><div class="s-lab">Features (F1–F9)</div></div>
+    <div class="stat"><div class="s-num">3</div><div class="s-lab">Escalas geradas</div></div>
+    <div class="stat"><div class="s-num">0</div><div class="s-lab">IA na geração</div></div>
+  </div>
+
+  <!-- Fase 0 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">0</div>
+      <div class="phase-title"><h2>Setup &amp; Infra</h2></div>
+    </div>
+    <ul class="tasks">
+      <li>Inicializar Next.js 15 (App Router + TypeScript)</li>
+      <li>Tailwind com tokens do <code>designsystem.md</code> (verde FMUSP, dourado, neutros)</li>
+      <li>Instalar e configurar shadcn/ui</li>
+      <li>Adicionar fonte Inter</li>
+      <li>Drizzle ORM + driver Postgres</li>
+      <li>Projeto Supabase + cliente (<code>lib/supabase</code>)</li>
+      <li>Variáveis de ambiente (<code>.env.local</code>, <code>.env.example</code>)</li>
+      <li>Deploy inicial na Vercel</li>
+    </ul>
+  </div>
+
+  <!-- Fase 1 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">1</div>
+      <div class="phase-title"><h2>Modelo de Dados</h2>
+        <div class="ftags"><span class="ftag base">base</span></div></div>
+    </div>
+    <ul class="tasks">
+      <li><code>users</code> · <code>rotations</code> · <code>student_rotations</code></li>
+      <li><code>shifts</code> (data, turno, tipo) · <code>shift_preferences</code></li>
+      <li><code>draft_preferences</code> · <code>submitted_preferences</code> (submitted_at)</li>
+      <li>Enums: role, turno, tipo, preference</li>
+      <li>Gerar e aplicar migrations</li>
+      <li>RLS: aluno vê só suas rotações; preceptor vê só as que criou</li>
+    </ul>
+  </div>
+
+  <!-- Fase 2 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">2</div>
+      <div class="phase-title"><h2>Auth &amp; Cadastro</h2>
+        <div class="ftags"><span class="ftag">F1</span></div></div>
+    </div>
+    <ul class="tasks">
+      <li>Supabase Auth (email + senha)</li>
+      <li>Cadastro: <b>nome, turma</b>, email, senha e papel (Aluno / Preceptor)</li>
+      <li>Página de login + logout</li>
+      <li>Criar registro em <code>users</code> com role</li>
+      <li>Guards de rota por papel</li>
+      <li>Roteamento pós-login: Aluno → área aluno; Preceptor → área preceptor</li>
+    </ul>
+  </div>
+
+  <!-- Fase 3 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">3</div>
+      <div class="phase-title"><h2>Preceptor · Criar Escala</h2>
+        <div class="ftags"><span class="ftag">F2</span></div></div>
+    </div>
+    <ul class="tasks">
+      <li>Form de rotação: nome, data início, <b>duração 2 / 3 / 6 semanas</b>, nº de alunos</li>
+      <li>Gerar automaticamente shifts: Manhã/Tarde/Noite por dia</li>
+      <li>Shifts nascem como <code>PLANTAO</code></li>
+      <li>Listagem das rotações do preceptor</li>
+      <li>Abrir rotação → tabela/calendário interativo</li>
+    </ul>
+  </div>
+
+  <!-- Fase 4 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">4</div>
+      <div class="phase-title"><h2>Preceptor · Calendário Interativo</h2>
+        <div class="ftags"><span class="ftag">F3</span><span class="ftag">F4</span></div></div>
+    </div>
+    <ul class="tasks">
+      <li>Componente <code>calendar-grid</code>: semanas (seg–dom) × 3 turnos</li>
+      <li>Marcar <b>dias/turnos disponíveis para plantão</b></li>
+      <li>Registrar <b>aulas / provas / reuniões</b> → tipo AULA/PROVA (bloqueado)</li>
+      <li>Shifts bloqueados destacados e sem preferência do aluno</li>
+      <li>Adicionar alunos à rotação (<code>student_rotations</code>)</li>
+      <li>Persistir alterações do calendário</li>
+    </ul>
+  </div>
+
+  <!-- Fase 5 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">5</div>
+      <div class="phase-title"><h2>Aluno · Preferências</h2>
+        <div class="ftags"><span class="ftag">F5</span></div></div>
+    </div>
+    <ul class="tasks">
+      <li>Listar escalas em que o aluno foi incluído</li>
+      <li><b>Cópia da grade matricial</b> (semanas × seg–dom × Manhã/Tarde/Noite)</li>
+      <li>Shifts bloqueados exibidos como "Bloqueado" (não editável)</li>
+      <li><code>shift-selector</code>: célula aceita Quero / Posso / Impossível</li>
+      <li>Rascunho local (sem realtime, sem salvar no banco)</li>
+      <li>Indicador de progresso (% preenchido)</li>
+    </ul>
+  </div>
+
+  <!-- Fase 6 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">6</div>
+      <div class="phase-title"><h2>Aluno · Submissão</h2>
+        <div class="ftags"><span class="ftag">F6</span></div></div>
+    </div>
+    <ul class="tasks">
+      <li>Validar <b>100% das células</b> preenchidas</li>
+      <li>Botão "Enviar Preferências" habilita só com tudo preenchido</li>
+      <li>Confirmação "Sua escala foi enviada" + <b>mudança de cor do botão</b></li>
+      <li>Persistir <code>shift_preferences</code> + <code>submitted_preferences</code> (submitted_at)</li>
+      <li>Bloquear edição após envio · status "Preferências enviadas"</li>
+    </ul>
+  </div>
+
+  <!-- Fase 7 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">7</div>
+      <div class="phase-title"><h2>Gerador Determinístico</h2>
+        <div class="ftags"><span class="ftag">F7</span></div></div>
+    </div>
+    <ul class="tasks">
+      <li><code>lib/scheduler</code> com interface agnóstica ao motor (futuro OR-Tools)</li>
+      <li>Scores: QUERO = 100 · POSSO = 20 · IMPOSSIVEL = proibido</li>
+      <li>Restrição dura: nunca alocar IMPOSSÍVEL</li>
+      <li>Restrição: máx. plantões/semana · máx. noites consecutivas</li>
+      <li>Distribuição equilibrada dos QUERO entre alunos</li>
+      <li>Gerar <b>3 escalas</b>: A satisfação · B carga · C satisfação + equidade</li>
+      <li>Disparado pelo preceptor após todas as submissões · persistir resultados</li>
+    </ul>
+  </div>
+
+  <!-- Fase 8 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">8</div>
+      <div class="phase-title"><h2>Comparação &amp; Métricas</h2>
+        <div class="ftags"><span class="ftag">F8</span><span class="ftag">F9</span></div></div>
+    </div>
+    <ul class="tasks">
+      <li>Tela de comparação das 3 escalas · preceptor escolhe a oficial</li>
+      <li>Ao clicar num aluno, exibir:</li>
+      <li class="sub">nº de turnos <b>QUERO aceitos</b></li>
+      <li class="sub">nº de turnos <b>POSSO aceitos</b></li>
+      <li class="sub">nº de turnos IMPOSSÍVEL aceitos (deve ser <span class="zero">0</span>)</li>
+      <li class="sub"><b>horas/semana</b> (seg–dom) = plantão + aulas/provas obrigatórias</li>
+      <li>% de satisfação por aluno</li>
+      <li>Dashboard: heatmap, barras horizontais, tabela de carga por aluno/semana</li>
+      <li>Escala oficial visível para os alunos</li>
+    </ul>
+  </div>
+
+  <!-- Fase 9 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">9</div>
+      <div class="phase-title"><h2>Landing Page &amp; Polimento</h2></div>
+    </div>
+    <ul class="tasks">
+      <li>Landing page institucional (verde FMUSP, "Casa de Arnaldo")</li>
+      <li>Estados vazios (sem escalas / submissões / alunos)</li>
+      <li>Responsividade da grade e do dashboard</li>
+      <li>Aderência total ao <code>designsystem.md</code> (sem pizza/3D · motion ease-out)</li>
+    </ul>
+  </div>
+
+  <!-- Fase 10 -->
+  <div class="phase">
+    <div class="phase-head">
+      <div class="phase-num">10</div>
+      <div class="phase-title"><h2>Deploy &amp; Verificação</h2></div>
+    </div>
+    <ul class="tasks">
+      <li>Revisar políticas RLS</li>
+      <li>Seed de teste (1 preceptor, ~10 alunos, 1 rotação)</li>
+      <li>Smoke test fim-a-fim: cadastro → criar → preencher → submeter → gerar → métricas</li>
+      <li>Deploy de produção na Vercel</li>
+    </ul>
+  </div>
+
+  <footer>
+    Escala Internato FMUSP · Relacionados:
+    <a href="prd.html">prd.html</a> ·
+    <a href="designsystem.md">designsystem.md</a> ·
+    <a href="CLAUDE.md">CLAUDE.md</a>
+  </footer>
+
+</div>
+</body>
+</html>

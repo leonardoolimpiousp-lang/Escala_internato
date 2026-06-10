@@ -1,0 +1,125 @@
+# PRD — Escala Internato FMUSP
+
+## 1. Visão Geral
+
+Plataforma web para **coleta de preferências de turnos** dos alunos do internato e **geração determinística de escalas** pelo preceptor.
+
+**Problema:** Escalas de internato hoje são montadas manualmente em planilhas, processo lento, sujeito a erros e percebido como injusto. Não há registro estruturado das preferências dos alunos nem critério transparente de alocação.
+
+**Solução:** Um sistema onde o preceptor cria a escala de uma rotação, os alunos declaram preferências por turno (Quero / Posso / Impossível) em uma grade, e um motor determinístico gera escalas otimizadas — respeitando restrições e maximizando satisfação.
+
+**Resultado esperado:** Escalas justas, geradas em segundos, com métricas claras de satisfação e equidade de carga horária.
+
+---
+
+## 2. Personas
+
+### Aluno (interno)
+- Visualiza as rotações em que foi incluído.
+- Preenche suas preferências de turno em uma grade matricial.
+- Envia as preferências quando 100% preenchidas.
+- Consulta sua escala final e métricas pessoais.
+
+### Preceptor
+- Cria rotações (período, nº de alunos).
+- Define dias bloqueados (aulas, provas, reuniões).
+- Adiciona alunos à rotação.
+- Dispara a geração de escalas e escolhe entre as opções.
+- Acompanha métricas de satisfação e carga por aluno.
+
+---
+
+## 3. Conceitos de Domínio
+
+| Conceito | Descrição |
+|---|---|
+| **Rotation** | Uma escala de internato. Ex.: "Clínica Médica — Maio 2027". Tem `data_inicio`, `data_fim`, `numero_alunos`. |
+| **Shift** | Um turno: data + período (Manhã / Tarde / Noite) + tipo. Gerados automaticamente ao criar a rotação. |
+| **Tipo de shift** | `PLANTAO` · `AULA` · `PROVA`. Aulas/provas viram turnos obrigatórios (bloqueados). |
+| **Preferência** | Escolha do aluno para um shift: `QUERO` · `POSSO` · `IMPOSSIVEL`. |
+| **Escala gerada** | Resultado da alocação determinística. O sistema produz 3 variantes. |
+
+---
+
+## 4. Features Core (MVP)
+
+### F1 — Cadastro e Login
+Cadastro com email + senha (Supabase Auth) e papel (Aluno / Preceptor).
+**Aceite:** usuário consegue se cadastrar, logar e é roteado para a área do seu papel.
+
+### F2 — Criar Rotação
+Preceptor cria rotação com `data_inicio`, `data_fim` e `numero_alunos`. O sistema gera automaticamente os shifts (Manhã/Tarde/Noite para cada dia do período).
+**Aceite:** após criar, todos os shifts do período existem com tipo `PLANTAO` por padrão.
+
+### F3 — Dias Bloqueados
+Preceptor marca eventos (Aula / Prova / Reunião). Esses shifts viram obrigatórios e não recebem preferência do aluno.
+**Aceite:** shifts marcados aparecem como "Bloqueado pelo preceptor" na grade do aluno.
+
+### F4 — Adicionar Alunos à Rotação
+Preceptor associa alunos à rotação (`student_rotations`).
+**Aceite:** apenas alunos associados veem a rotação e podem preencher preferências.
+
+### F5 — Preenchimento de Preferências (grade matricial)
+Aluno preenche preferências em uma **grade** (semana × dias × 3 turnos), **não** em calendário tradicional. Salvo como rascunho local — sem realtime.
+**Aceite:** cada célula aceita Quero/Posso/Impossível; estado preservado durante a navegação.
+
+### F6 — Envio de Preferências
+Botão "Enviar Preferências" só habilita com **100% das células preenchidas**. Ao enviar, grava a submissão e `submitted_at`.
+**Aceite:** botão desabilitado se houver célula vazia; após envio, status muda para "Preferências enviadas" e não é mais editável (no MVP).
+
+### F7 — Geração de Escala
+Worker determinístico produz **3 soluções**:
+- **Escala A** — máxima satisfação (prioriza QUERO).
+- **Escala B** — balanceamento de carga horária.
+- **Escala C** — satisfação + equidade.
+
+**Aceite:** nenhuma alocação cai em turno marcado como IMPOSSÍVEL; as 3 escalas são apresentadas com suas métricas.
+
+### F8 — Escolha da Escala
+Preceptor compara as 3 e seleciona uma como oficial.
+**Aceite:** escala escolhida fica marcada e visível para os alunos.
+
+### F9 — Dashboard de Métricas
+- **Por aluno:** turnos QUERO aceitos, POSSO aceitos, IMPOSSÍVEL aceitos (deve ser 0), % de satisfação.
+- **Por semana:** carga horária (heatmap / barras horizontais / tabela).
+
+**Aceite:** métricas batem com a escala selecionada.
+
+---
+
+## 5. Regras de Negócio
+
+1. Turno marcado como **IMPOSSÍVEL nunca** é alocado.
+2. Distribuição de turnos equilibrada entre alunos.
+3. Carga horária semelhante entre alunos.
+4. Respeitar máximo de plantões por semana.
+5. Respeitar máximo de noites consecutivas.
+6. Preferências só são consideradas após envio (submitted).
+7. Shifts bloqueados (Aula/Prova) são obrigatórios e ignoram preferência.
+
+---
+
+## 6. Métricas de Sucesso
+
+- **% de satisfação média** dos alunos (peso QUERO/POSSO atendidos).
+- **Equidade de carga** — desvio de horas entre alunos dentro de uma faixa aceitável.
+- **0 alocações** em turnos IMPOSSÍVEL.
+- Tempo de geração de escala < poucos segundos para turmas de 20–200 alunos.
+
+---
+
+## 7. Fora de Escopo (v1)
+
+- Atualização em tempo real (realtime).
+- Quarto nível de preferência ("Quero Muito").
+- Otimização via Google OR-Tools (motor heurístico em TS no MVP).
+- Storage / anexos.
+- Notificações (email/push).
+- Edição de preferências após envio.
+
+---
+
+## 8. Referências
+
+- Identidade visual e componentes: `designsystem.md`.
+- Stack, modelo de dados e convenções: `CLAUDE.md`.
