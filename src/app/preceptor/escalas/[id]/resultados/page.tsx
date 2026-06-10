@@ -10,7 +10,10 @@ import {
   getSchedulesForRotation,
   getAssignmentsWithNames,
 } from "@/server/repositories/schedules";
-import { computeScheduleMetrics } from "@/lib/scheduler/metrics";
+import {
+  computeScheduleMetrics,
+  computeWeeklyHoras,
+} from "@/lib/scheduler/metrics";
 import type { Preference } from "@/lib/scheduler";
 import {
   ScheduleViewer,
@@ -51,6 +54,11 @@ export default async function ResultadosPage({
   const studentNames: Record<string, string> = {};
   for (const s of students) studentNames[s.id] = s.nome;
 
+  const weeks = buildDateWeeks(rotation.dataInicio, rotation.dataFim);
+  const dateToWeek = new Map<string, number>();
+  for (const w of weeks)
+    for (const c of w.cells) dateToWeek.set(c.date, w.weekIndex);
+
   const items: ViewerItem[] = await Promise.all(
     schedules.map(async (sch) => {
       const rows = await getAssignmentsWithNames(sch.id);
@@ -59,6 +67,13 @@ export default async function ResultadosPage({
       for (const r of rows) {
         (assignmentsBySlot[r.slotId] ??= []).push(r.nome);
       }
+      const weeklyHoras = computeWeeklyHoras(
+        rows,
+        schedSlots,
+        dateToWeek,
+        studentIds,
+        weeks.length,
+      );
       return {
         id: sch.id,
         variante: sch.variante,
@@ -66,11 +81,10 @@ export default async function ResultadosPage({
         selected: sch.selected,
         metrics,
         assignmentsBySlot,
+        weeklyHoras,
       };
     }),
   );
-
-  const weeks = buildDateWeeks(rotation.dataInicio, rotation.dataFim);
 
   return (
     <>

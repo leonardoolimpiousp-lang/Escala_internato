@@ -35,6 +35,7 @@ export type ViewerItem = {
   selected: boolean;
   metrics: ScheduleMetrics;
   assignmentsBySlot: Record<string, string[]>; // slotId → nomes
+  weeklyHoras: Record<string, number[]>; // studentId → horas por semana
 };
 
 function firstName(nome: string) {
@@ -290,6 +291,90 @@ export function ScheduleViewer({
           </tbody>
         </table>
       </div>
+
+      {/* Heatmap: carga horária por semana */}
+      <h2 className="mt-10 mb-1 text-lg font-semibold text-gray-900">
+        Carga horária por semana
+      </h2>
+      <p className="mb-3 text-sm text-gray-500">
+        Horas por aluno em cada semana (seg–dom). Cor mais forte = mais horas.
+      </p>
+      <WeeklyHeatmap
+        weeklyHoras={activeItem.weeklyHoras}
+        numWeeks={weeks.length}
+        studentNames={studentNames}
+      />
+    </div>
+  );
+}
+
+function WeeklyHeatmap({
+  weeklyHoras,
+  numWeeks,
+  studentNames,
+}: {
+  weeklyHoras: Record<string, number[]>;
+  numWeeks: number;
+  studentNames: Record<string, string>;
+}) {
+  const ids = Object.keys(weeklyHoras).sort((a, b) =>
+    (studentNames[a] ?? "").localeCompare(studentNames[b] ?? ""),
+  );
+  const maxH = Math.max(
+    1,
+    ...ids.flatMap((id) => weeklyHoras[id] ?? []),
+  );
+
+  return (
+    <div className="overflow-x-auto rounded-[--radius-lg] border border-gray-200">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-gray-50 text-left text-xs uppercase tracking-wide text-gray-500">
+            <th className="px-4 py-2 font-medium">Aluno</th>
+            {Array.from({ length: numWeeks }, (_, i) => (
+              <th key={i} className="px-2 py-2 text-center font-medium">
+                Sem {i + 1}
+              </th>
+            ))}
+            <th className="px-3 py-2 text-center font-medium">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ids.map((id) => {
+            const horas = weeklyHoras[id] ?? [];
+            const total = horas.reduce((a, b) => a + b, 0);
+            return (
+              <tr key={id} className="border-t border-gray-100">
+                <td className="whitespace-nowrap px-4 py-1.5 font-medium text-gray-900">
+                  {studentNames[id] ?? "—"}
+                </td>
+                {Array.from({ length: numWeeks }, (_, i) => {
+                  const h = horas[i] ?? 0;
+                  const ratio = h / maxH;
+                  return (
+                    <td key={i} className="px-1 py-1 text-center">
+                      <div
+                        className="rounded py-1 text-xs font-medium"
+                        style={{
+                          backgroundColor: h
+                            ? `rgba(15,107,69,${0.12 + 0.68 * ratio})`
+                            : "var(--color-gray-50)",
+                          color: ratio > 0.5 ? "#fff" : "var(--color-gray-700)",
+                        }}
+                      >
+                        {h ? `${h}h` : "—"}
+                      </div>
+                    </td>
+                  );
+                })}
+                <td className="px-3 py-1.5 text-center font-semibold text-gray-900">
+                  {total}h
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }

@@ -122,3 +122,27 @@ export function computeScheduleMetrics(
     perStudent: [...per.values()],
   };
 }
+
+/**
+ * Horas por aluno em cada semana (seg–dom) da escala.
+ * Retorna { studentId: [horasSemana0, horasSemana1, ...] }.
+ */
+export function computeWeeklyHoras(
+  assignments: Assignment[],
+  slots: SchedSlot[],
+  dateToWeek: Map<string, number>,
+  studentIds: string[],
+  numWeeks: number,
+): Record<string, number[]> {
+  const slotsById = new Map(slots.map((s) => [s.id, s]));
+  const out: Record<string, number[]> = {};
+  for (const id of studentIds) out[id] = new Array(numWeeks).fill(0);
+  for (const a of assignments) {
+    const slot = slotsById.get(a.slotId);
+    if (!slot) continue;
+    const wi = dateToWeek.get(slot.data);
+    if (wi === undefined || !out[a.studentId]) continue;
+    out[a.studentId][wi] += TURNO_HORAS[slot.turno];
+  }
+  return out;
+}
