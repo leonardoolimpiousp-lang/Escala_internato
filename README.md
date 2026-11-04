@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Escala Internato — FMUSP
 
-## Getting Started
+Plataforma web para **coleta de preferências de turnos** do internato médico (FMUSP) e **geração determinística de escalas** pelo preceptor.
 
-First, run the development server:
+Não é rede social nem app colaborativo em tempo real — é essencialmente **coleta de preferências + geração de escalas**.
+
+## Como funciona
+
+1. O **preceptor** cria uma rotação (período, número de alunos) e monta a grade de turnos.
+2. Cada **aluno** preenche suas preferências célula a célula: `QUERO`, `POSSO` ou `IMPOSSÍVEL`. O envio só é permitido com **100% das células preenchidas**.
+3. O preceptor roda o **gerador determinístico** (sem IA), que produz **3 variantes** de escala respeitando as restrições duras.
+
+## Stack
+
+| Camada | Tecnologia |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| Linguagem | TypeScript (strict) |
+| Estilo | Tailwind v4 (tokens via `@theme` em `globals.css`) |
+| Componentes | shadcn/ui |
+| Backend | Supabase (Auth + PostgreSQL + RLS) |
+| ORM | Drizzle ORM |
+| Deploy | Vercel |
+
+**Auth:** e-mail + senha via Supabase Auth, com papel `ALUNO` ou `PRECEPTOR`.
+
+## Começando
 
 ```bash
+# 1. Instalar dependências
+npm install
+
+# 2. Configurar variáveis de ambiente
+cp .env.example .env.local
+# preencha as chaves do Supabase
+
+# 3. Aplicar schema no banco
+npm run db:push
+
+# 4. Rodar em desenvolvimento
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script | Descrição |
+|---|---|
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Build de produção |
+| `npm run lint` | ESLint |
+| `npm run db:generate` | Gera migrations a partir do schema Drizzle |
+| `npm run db:migrate` | Aplica migrations |
+| `npm run db:push` | Sincroniza o schema direto no banco |
+| `npm run db:studio` | Abre o Drizzle Studio |
+| `npm run db:seed` | Popula os estágios de exemplo |
 
-## Learn More
+## Estrutura
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/            # rotas (login, cadastro, dashboard, aluno/, preceptor/)
+  components/     # calendar-grid, shift-selector, scale-table
+  lib/            # supabase, auth, scheduler (motor heurístico)
+  server/
+    actions/      # Server Actions (mutações)
+    repositories/ # acesso a dados isolado
+  workers/
+    schedule-generator/
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Algoritmo do Scheduler
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Motor **determinístico** em TypeScript (sem IA). Pontuação por preferência:
 
-## Deploy on Vercel
+```
+QUERO      = 100
+POSSO      =  20
+IMPOSSÍVEL = proibido (restrição dura)
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Restrições duras:** nunca alocar `IMPOSSÍVEL`, respeitar o máximo de plantões por semana e o máximo de noites consecutivas.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Objetivos:** maximizar satisfação e equilibrar carga horária entre alunos.
+
+Gera 3 variantes:
+- **A** — satisfação
+- **B** — carga horária
+- **C** — satisfação + equidade
+
+A interface do scheduler é agnóstica ao motor, permitindo trocar a heurística por OR-Tools no futuro sem reescrever o resto.
+
+## Convenções
+
+- Mutações sempre via Server Actions; o client nunca escreve direto no Supabase.
+- Acesso a dados isolado em `server/repositories`.
+- RLS habilitado: aluno só vê suas rotações; preceptor só as que criou.
+- Termos de domínio em PT (rotation, shift, preferência); identificadores de código em EN.
+
+---
+
+> Documentos de referência no repositório: `.prd` (requisitos), `designsystem.md` (identidade visual) e `TASKS.md` (roadmap).
